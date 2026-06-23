@@ -1,6 +1,6 @@
 import RouteCard from './RouteCard'
 
-export default function RouteList({ t, routes, selectedRouteIndex, onSelect, status, errorKey }) {
+export default function RouteList({ t, routes, selectedRouteIndex, onSelect, status, errorKey, suggestedAddress, onUseSuggestion }) {
   if (status === 'loading') {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-10 text-gray-500">
@@ -11,6 +11,25 @@ export default function RouteList({ t, routes, selectedRouteIndex, onSelect, sta
   }
 
   if (status === 'error') {
+    if (errorKey === 'errorSuggestAddress' && suggestedAddress) {
+      const suggestion = [suggestedAddress.from, suggestedAddress.to]
+        .filter(Boolean)
+        .join(' → ')
+      return (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
+          <p className="mb-2">
+            {t.errorSuggestAddress}{' '}
+            <strong>"{suggestion}"</strong>?
+          </p>
+          <button
+            onClick={onUseSuggestion}
+            className="rounded-md bg-yellow-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-yellow-700"
+          >
+            {t.useSuggestedAddress}
+          </button>
+        </div>
+      )
+    }
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
         {t[errorKey] ?? t.errorGeneral}

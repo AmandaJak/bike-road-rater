@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react'
-import { geocodeAddress } from '../services/geocode'
+import { geocodeAddress, stripFloorFromAddress } from '../services/geocode'
 import { fetchRoutes } from '../services/routing'
 import { processRoutes } from '../services/scoring'
 
@@ -11,6 +11,7 @@ export function useRoutes() {
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0)
   const [status, setStatus] = useState('idle')
   const [errorKey, setErrorKey] = useState(null)
+  const [suggestedAddress, setSuggestedAddress] = useState(null)
 
   const filtersRef = useRef({ preferCycleways: 0.5, avoidLargeRoads: 0.5 })
   const hardExcludesRef = useRef({ avoidStateRoads: false })
@@ -19,6 +20,7 @@ export function useRoutes() {
     hardExcludesRef.current = hardExcludes
     setStatus('loading')
     setErrorKey(null)
+    setSuggestedAddress(null)
     setRoutes([])
 
     try {
@@ -43,8 +45,16 @@ export function useRoutes() {
       setStatus('idle')
     } catch (err) {
       console.error('[useRoutes] error:', err)
-      if (err.message === 'ADDRESS_NOT_FOUND') setErrorKey('errorAddressNotFound')
-      else if (err.message === 'DAILY_LIMIT') setErrorKey('errorDailyLimit')
+      if (err.message === 'ADDRESS_NOT_FOUND') {
+        const strippedFrom = stripFloorFromAddress(fromAddress)
+        const strippedTo = stripFloorFromAddress(toAddress)
+        if (strippedFrom !== fromAddress || strippedTo !== toAddress) {
+          setSuggestedAddress({ from: strippedFrom, to: strippedTo })
+          setErrorKey('errorSuggestAddress')
+        } else {
+          setErrorKey('errorAddressNotFound')
+        }
+      } else if (err.message === 'DAILY_LIMIT') setErrorKey('errorDailyLimit')
       else if (err.message === 'RATE_LIMIT') setErrorKey('errorRateLimit')
       else setErrorKey('errorGeneral')
       setStatus('error')
@@ -80,6 +90,7 @@ export function useRoutes() {
     setSelectedRouteIndex,
     status,
     errorKey,
+    suggestedAddress,
     search,
     reScore,
   }

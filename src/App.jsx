@@ -26,6 +26,7 @@ export default function App() {
     setSelectedRouteIndex,
     status,
     errorKey,
+    suggestedAddress,
     search,
     reScore,
   } = useRoutes()
@@ -41,6 +42,15 @@ export default function App() {
     },
     [reScore],
   )
+
+  const handleUseSuggestion = useCallback(() => {
+    if (!suggestedAddress) return
+    const newFrom = suggestedAddress.from ?? fromAddress
+    const newTo = suggestedAddress.to ?? toAddress
+    setFromAddress(newFrom)
+    setToAddress(newTo)
+    search(newFrom, newTo, hardExcludes)
+  }, [suggestedAddress, fromAddress, toAddress, hardExcludes, search])
 
   const handleHardExcludeChange = useCallback(
     (newHardExcludes) => {
@@ -96,6 +106,8 @@ export default function App() {
           onSelect={setSelectedRouteIndex}
           status={status}
           errorKey={errorKey}
+          suggestedAddress={suggestedAddress}
+          onUseSuggestion={handleUseSuggestion}
         />
       </aside>
 

@@ -1,5 +1,13 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 
+export function stripFloorFromAddress(query) {
+  return query
+    .split(',')
+    .map((p) => p.trim())
+    .filter((p) => !/^(\d+\.?\s*(tv|th|mf|vr|vt)?|st\.?|kl\.?)$/i.test(p))
+    .join(', ')
+}
+
 let lastCallTime = 0
 
 export async function geocodeAddress(query) {
