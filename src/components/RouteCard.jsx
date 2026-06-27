@@ -1,47 +1,46 @@
-const SAFETY_BADGE_COLOR = {
-  'Very Safe': 'bg-green-100 text-green-800',
-  Safe: 'bg-green-50 text-green-700',
-  Moderate: 'bg-yellow-100 text-yellow-800',
-  Risky: 'bg-orange-100 text-orange-800',
-  Dangerous: 'bg-red-100 text-red-800',
+const SAFETY_KEY_MAP = {
+  'Very Safe': 'safetyVery',
+  Safe: 'safetySafe',
+  Moderate: 'safetyModerate',
+  Risky: 'safetyRisky',
+  Dangerous: 'safetyDangerous',
 }
 
-const SAFETY_BADGE_COLOR_DA = {
-  'Meget sikker': 'bg-green-100 text-green-800',
-  Sikker: 'bg-green-50 text-green-700',
-  Moderat: 'bg-yellow-100 text-yellow-800',
-  Risikabel: 'bg-orange-100 text-orange-800',
-  Farlig: 'bg-red-100 text-red-800',
+function badgeClass(overallScore) {
+  if (overallScore <= 2.5) return 'bg-[#EAF3DE] text-[#3B6D11]'
+  if (overallScore <= 3.5) return 'bg-[#FAEEDA] text-[#854F0B]'
+  return 'bg-[#FCEBEB] text-[#A32D2D]'
 }
 
 export default function RouteCard({ t, route, index, selected, onClick }) {
-  const badgeClass =
-    SAFETY_BADGE_COLOR[route.safetyLabel] ??
-    SAFETY_BADGE_COLOR_DA[route.safetyLabel] ??
-    'bg-gray-100 text-gray-700'
-
   const totalLen = route.segments.reduce((s, seg) => s + seg.length, 0)
+  const labelKey = SAFETY_KEY_MAP[route.safetyLabel]
+  const displayLabel = (labelKey && t[labelKey]) ?? route.safetyLabel
 
   return (
     <button
       onClick={onClick}
-      className={`w-full rounded-xl border p-3 text-left transition ${
+      className={`w-full rounded-xl p-4 text-left transition border-2 ${
         selected
-          ? 'border-green-500 bg-green-50 shadow-md'
-          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+          ? 'border-[#3B6D11] bg-[#F4FAF0]'
+          : 'border-transparent bg-white shadow-sm hover:shadow-md'
       }`}
+      style={{ boxShadow: selected ? undefined : '0 0 0 1px #e5e7eb' }}
     >
-      <div className="flex items-center justify-between mb-2">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
         <span className="font-semibold text-sm text-gray-800">
           {t.routeLabel} {index + 1}
         </span>
-        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${badgeClass}`}>
-          {route.safetyLabel}
+        <span
+          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${badgeClass(route.overallScore)}`}
+        >
+          {displayLabel}
         </span>
       </div>
 
-      {/* Segmented color bar */}
-      <div className="flex rounded overflow-hidden h-2 mb-2">
+      {/* Colour bar */}
+      <div className="flex overflow-hidden rounded mb-3" style={{ height: '6px' }}>
         {route.segments.map((seg, i) => (
           <div
             key={i}
@@ -53,18 +52,19 @@ export default function RouteCard({ t, route, index, selected, onClick }) {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs text-gray-600">
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500">
         <span>
-          {t.safetyScore}: <strong>{route.overallScore.toFixed(1)}</strong> / 5
+          {t.safetyScore}: <strong className="text-gray-700">{route.overallScore.toFixed(1)}</strong> / 5
         </span>
         <span>
-          {route.cyclewayPercent}% {t.cyclewayPercent}
+          <strong className="text-gray-700">{route.cyclewayPercent}%</strong> {t.cyclewayPercent}
         </span>
         <span>
-          {t.distance}: <strong>{route.distanceKm} {t.km}</strong>
+          {t.distance}: <strong className="text-gray-700">{route.distanceKm} {t.km}</strong>
         </span>
         <span>
-          {t.duration}: <strong>{route.durationMin} {t.min}</strong>
+          {t.duration}: <strong className="text-gray-700">{route.durationMin} {t.min}</strong>
         </span>
       </div>
     </button>
