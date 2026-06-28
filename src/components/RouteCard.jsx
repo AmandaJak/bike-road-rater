@@ -20,20 +20,25 @@ export default function RouteCard({ t, route, index, selected, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full rounded-xl p-4 text-left transition border-2 ${
+      className={`route-card-unselected w-full p-4 text-left transition ${
         selected
-          ? 'border-[#3B6D11] bg-[#F4FAF0]'
-          : 'border-transparent bg-white shadow-sm hover:shadow-md'
+          ? 'border-2 border-[#3B6D11] bg-[#f4f9ee]'
+          : 'border border-[#d7d4ca] bg-white'
       }`}
-      style={{ boxShadow: selected ? undefined : '0 0 0 1px #e5e7eb' }}
+      style={{
+        borderRadius: '10px',
+        fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
+        boxShadow: selected ? undefined : '0 1px 3px rgba(20,30,40,0.06)',
+        cursor: 'pointer',
+      }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <span className="font-semibold text-sm text-gray-800">
+        <span style={{ fontSize: '14px', fontWeight: 600, color: '#1c2530' }}>
           {t.routeLabel} {index + 1}
         </span>
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${badgeClass(route.overallScore)}`}
+          className={`rounded-[20px] px-[10px] py-[2px] text-xs font-semibold ${badgeClass(route.overallScore)}`}
         >
           {displayLabel}
         </span>
@@ -53,18 +58,18 @@ export default function RouteCard({ t, route, index, selected, onClick }) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500">
+      <div className="grid grid-cols-2 gap-x-2 gap-y-1" style={{ fontSize: '12px', color: '#5b6672' }}>
         <span>
-          {t.safetyScore}: <strong className="text-gray-700">{route.overallScore.toFixed(1)}</strong> / 5
+          {t.safetyScore}: <strong style={{ color: '#1c2530' }}>{route.overallScore.toFixed(1)}</strong> / 5
         </span>
         <span>
-          <strong className="text-gray-700">{route.cyclewayPercent}%</strong> {t.cyclewayPercent}
+          <strong style={{ color: '#1c2530' }}>{route.cyclewayPercent}%</strong> {t.cyclewayPercent}
         </span>
-        <span>
-          {t.distance}: <strong className="text-gray-700">{route.distanceKm} {t.km}</strong>
+        <span style={{ marginTop: '2px', fontWeight: 500 }}>
+          {route.distanceKm} {t.km}
         </span>
-        <span>
-          {t.duration}: <strong className="text-gray-700">{route.durationMin} {t.min}</strong>
+        <span style={{ marginTop: '2px', fontWeight: 500 }}>
+          {route.durationMin} {t.min}
         </span>
       </div>
     </button>
