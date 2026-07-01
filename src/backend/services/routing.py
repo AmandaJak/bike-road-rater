@@ -1,4 +1,5 @@
 import os
+import time
 
 import httpx
 from fastapi import APIRouter
@@ -8,6 +9,11 @@ from pydantic import BaseModel
 router = APIRouter()
 
 ORS_URL = "https://api.openrouteservice.org/v2/directions/cycling-regular/geojson"
+
+# In-memory cache: key → (response_json, cached_at)
+_cache: dict[tuple, tuple[dict, float]] = {}
+_CACHE_TTL = 86400.0  # 24 hours
+_CACHE_MAX = 1000
 
 
 class HardExcludes(BaseModel):
@@ -20,8 +26,35 @@ class RouteRequest(BaseModel):
     hard_excludes: HardExcludes = HardExcludes()
 
 
+def _cache_key(req: RouteRequest) -> tuple:
+    return (tuple(req.from_coords), tuple(req.to_coords), req.hard_excludes.avoidStateRoads)
+
+
+def _cache_get(key: tuple) -> dict | None:
+    entry = _cache.get(key)
+    if entry is None:
+        return None
+    data, cached_at = entry
+    if time.monotonic() - cached_at > _CACHE_TTL:
+        del _cache[key]
+        return None
+    return data
+
+
+def _cache_set(key: tuple, data: dict) -> None:
+    if len(_cache) >= _CACHE_MAX:
+        oldest_key = min(_cache, key=lambda k: _cache[k][1])
+        del _cache[oldest_key]
+    _cache[key] = (data, time.monotonic())
+
+
 @router.post("")
 async def get_routes(req: RouteRequest):
+    key = _cache_key(req)
+    cached = _cache_get(key)
+    if cached is not None:
+        return cached
+
     api_key = os.environ.get("ORS_API_KEY", "")
     if not api_key:
         return JSONResponse(status_code=500, content={"error": "ORS_API_KEY not configured"})
@@ -56,4 +89,6 @@ async def get_routes(req: RouteRequest):
             content={"error": "ORS_ERROR", "status": resp.status_code},
         )
 
-    return resp.json()
+    data = resp.json()
+    _cache_set(key, data)
+    return data
