@@ -14,9 +14,9 @@ export default function RouteList({
 }) {
   if (status === 'loading') {
     return (
-      <div className="flex items-center gap-3 text-gray-500 py-2">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#5b6672', padding: '8px 0' }}>
         <Spinner />
-        <span className="text-sm">{t.calculating}</span>
+        <span style={{ fontSize: '14px' }}>{t.calculating}</span>
       </div>
     )
   }
@@ -27,14 +27,14 @@ export default function RouteList({
         .filter(Boolean)
         .join(' → ')
       return (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900 flex items-center gap-4">
-          <p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderRadius: '8px', border: '1px solid #e2dfd5', background: '#fdf8f0', padding: '16px', fontSize: '14px', color: '#854F0B' }}>
+          <p style={{ margin: 0 }}>
             {t.errorSuggestAddress}{' '}
             <strong>"{suggestion}"</strong>?
           </p>
           <button
             onClick={onUseSuggestion}
-            className="shrink-0 rounded-md bg-yellow-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-yellow-700"
+            style={{ flexShrink: 0, borderRadius: '6px', background: '#854F0B', border: 'none', padding: '6px 12px', fontSize: '12px', fontWeight: 600, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}
           >
             {t.useSuggestedAddress}
           </button>
@@ -42,7 +42,7 @@ export default function RouteList({
       )
     }
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <div style={{ borderRadius: '8px', border: '1px solid #fecaca', background: '#fff5f5', padding: '16px', fontSize: '14px', color: '#A32D2D' }}>
         {t[errorKey] ?? t.errorGeneral}
       </div>
     )
@@ -50,7 +50,7 @@ export default function RouteList({
 
   if (status === 'no_route') {
     return (
-      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+      <div style={{ borderRadius: '8px', border: '1px solid #e2dfd5', background: '#fdf8f0', padding: '16px', fontSize: '14px', color: '#854F0B' }}>
         {t.noRouteFilters}
       </div>
     )
@@ -66,7 +66,11 @@ export default function RouteList({
 
   return (
     <div>
-      <div className="grid grid-cols-3 gap-4">
+      <div style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a929c', marginBottom: '16px' }}>
+        {t.routesSectionLabel}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
         {routes.map((route, i) => (
           <RouteCard
             key={i}
@@ -79,12 +83,28 @@ export default function RouteList({
         ))}
       </div>
 
-      <div className="mt-3 flex justify-end">
+      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
         <a
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg border border-[#3B6D11] px-4 py-2 text-xs font-semibold text-[#3B6D11] transition hover:bg-[#EAF3DE]"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '7px',
+            padding: '9px 16px',
+            border: '1px solid #3B6D11',
+            borderRadius: '7px',
+            background: 'transparent',
+            color: '#3B6D11',
+            fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
+            fontSize: '13px',
+            fontWeight: 600,
+            textDecoration: 'none',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(59,109,17,0.07)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
         >
           <MapIcon />
           {t.buildGoogleMapsRoute}
@@ -97,16 +117,16 @@ export default function RouteList({
 
 function Spinner() {
   return (
-    <svg className="h-5 w-5 animate-spin text-green-600" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+    <svg className="animate-spin" style={{ width: '20px', height: '20px', color: '#3B6D11' }} fill="none" viewBox="0 0 24 24">
+      <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
     </svg>
   )
 }
 
 function MapIcon() {
   return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg style={{ width: '15px', height: '15px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
     </svg>
   )
@@ -114,7 +134,7 @@ function MapIcon() {
 
 function ExternalLinkIcon() {
   return (
-    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg style={{ width: '13px', height: '13px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
     </svg>
   )
